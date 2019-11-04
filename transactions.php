@@ -26,7 +26,7 @@ class Transactions {
 
     }
 
-    private function getList($limit, $offset) {
+    public function getList($limit, $offset) {
 
         $result = $this->mysql->query("SELECT * FROM testdata LIMIT {$offset},{$limit}");
         return $result->fetch_all(MYSQLI_ASSOC);
@@ -36,7 +36,7 @@ class Transactions {
     public function getSummary() {
 
         $query = "SELECT 
-                type, SUM(amount)
+                type, SUM(amount) as amount
             FROM
                 testdata
             GROUP BY type
@@ -51,7 +51,7 @@ class Transactions {
         $query = "SELECT 
                 user, amount
             FROM
-                egtest.testdata
+                testdata
             ORDER BY amount desc
             limit 10";
         $result = $this->mysql->query($query);
