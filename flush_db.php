@@ -13,7 +13,7 @@ if ($mysql->connect_errno) {
 if (!$mysql->query("DROP TABLE IF EXISTS `egtest`.`testdata`;")) {
     echo "Drop table failed\n";
     echo "Error: " . $mysql->error . "\n";
-    //die();
+    die();
 }
 
 $sql = "CREATE TABLE IF NOT EXISTS `egtest`.`testdata` (
@@ -26,7 +26,7 @@ $sql = "CREATE TABLE IF NOT EXISTS `egtest`.`testdata` (
 if (!$mysql->query($sql)) {
     echo "Create table failed\n";
     echo "Error: " . $mysql->error . "\n";
-    //die();
+    die();
 }
 
 // insert 10 000 000 records

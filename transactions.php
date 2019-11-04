@@ -23,18 +23,44 @@ class Transactions {
     }
 
     public function getCount() {
-
-        $result = $this->mysql->query("SELECT count(*) AS Transactions FROM testdata");
-        $row = $result->fetch_assoc();
+		if(file_exists("cache.txt")){
+			$cache = file_get_contents("cache.txt");
+			$cache = json_decode($cache, true);
+			if(time() - filemtime("cache.txt") > CACHE_TIME || !isset($cache['Transactions'])){
+				$result = $this->mysql->query("SELECT count(id) AS Transactions FROM testdata");
+				$row = $result->fetch_assoc();
+				$cache['Transactions'] = $row['Transactions'];
+				file_put_contents("cache.txt", json_encode($cache));
+			}
+			$row['Transactions'] = $cache['Transactions'];
+		}else{			
+			$result = $this->mysql->query("SELECT count(id) AS Transactions FROM testdata");
+			$row = $result->fetch_assoc();
+			$cache['Transactions'] = $row['Transactions'];
+			file_put_contents("cache.txt", json_encode($cache));
+		}
         return $row['Transactions'];
 
     }
 
     public function getList($limit, $offset) {
-
-        $result = $this->mysql->query("SELECT * FROM testdata LIMIT {$offset},{$limit}");
-        return $result->fetch_all(MYSQLI_ASSOC);
-
+		if(file_exists("cache.txt")){
+			$cache = file_get_contents("cache.txt");
+			$cache = json_decode($cache, true);
+			if(time() - filemtime("cache.txt") > CACHE_TIME || !isset($cache['list'][$limit."-".$offset])){
+				$result = $this->mysql->query("SELECT id, user, type, amount FROM testdata LIMIT {$offset},{$limit}");
+				$ret = $result->fetch_all(MYSQLI_ASSOC);
+				$cache['list'][$limit."-".$offset] = $ret;
+				file_put_contents("cache.txt", json_encode($cache));
+			}
+			$ret = $cache['list'][$limit."-".$offset];
+		}else{
+			$result = $this->mysql->query("SELECT id, user, type, amount FROM testdata LIMIT {$offset},{$limit}");
+			$ret = $result->fetch_all(MYSQLI_ASSOC);
+			$cache['list'][$limit."-".$offset] = $ret;
+			file_put_contents("cache.txt", json_encode($cache));
+		}
+		return $ret;
     }
 
     public function getSummary() {
@@ -45,8 +71,23 @@ class Transactions {
                 testdata
             GROUP BY type
             ORDER BY type";
-        $result = $this->mysql->query($query);
-        return $result->fetch_all(MYSQLI_ASSOC);
+        if(file_exists("cache.txt")){
+			$cache = file_get_contents("cache.txt");
+			$cache = json_decode($cache, true);
+			if(time() - filemtime("cache.txt") > CACHE_TIME || !isset($cache['summary'])){
+				$result = $this->mysql->query($query);
+				$ret = $result->fetch_all(MYSQLI_ASSOC);
+				$cache['summary'] = $ret;
+				file_put_contents("cache.txt", json_encode($cache));
+			}
+			$ret = $cache['summary'];
+		}else{    
+			$result = $this->mysql->query($query);
+			$ret = $result->fetch_all(MYSQLI_ASSOC);
+			$cache['summary'] = $ret;
+			file_put_contents("cache.txt", json_encode($cache));
+        }
+        return $ret;
 
     }
 
@@ -58,8 +99,25 @@ class Transactions {
                 testdata
             ORDER BY amount desc
             limit 10";
-        $result = $this->mysql->query($query);
-        return $result->fetch_all(MYSQLI_ASSOC);
+            
+        if(file_exists("cache.txt")){
+			$cache = file_get_contents("cache.txt");
+			$cache = json_decode($cache, true);
+			if(time() - filemtime("cache.txt") > CACHE_TIME || !isset($cache['top'])){
+				$result = $this->mysql->query($query);
+				$ret = $result->fetch_all(MYSQLI_ASSOC);
+				$cache['top'] = $ret;
+				file_put_contents("cache.txt", json_encode($cache));
+			}
+			$ret = $cache['top'];
+		}else{
+			$result = $this->mysql->query($query);
+			$ret = $result->fetch_all(MYSQLI_ASSOC);
+			$cache['top'] = $ret;
+			file_put_contents("cache.txt", json_encode($cache));
+		}
+        
+        return $ret;
 
     }
     
@@ -72,6 +130,7 @@ class Transactions {
 		}
 		$query = "INSERT into testdata (user,type,amount) VALUES ('".$this->mysql->real_escape_string($user)."','".$type."','".intval($amount)."')";
 		$this->mysql->query($query);
+		unlink("cache.txt");
 		return "Ready";
 	}
 

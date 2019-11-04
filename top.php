@@ -7,7 +7,7 @@ $t = new Transactions();
 ?>
 <html>
 <head>
-    <title>Summary</title>
+    <title>Top</title>
     <style type="text/css">
         table {
             border-collapse: collapse;
