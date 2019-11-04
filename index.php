@@ -26,6 +26,7 @@ $t = new Transactions();
 
 <p><a href="summary.php">Summary report</a></p>
 <p><a href="top.php">Top report</a></p>
+<p><a href="add.php">Add transaction</a></p>
 
 <?php
 echo "<p>Transactions count: {$t->getCount()}</p>";

@@ -1,5 +1,3 @@
-
-
 <?php
 
 include 'transactions.php';
@@ -7,7 +5,6 @@ include 'transactions.php';
 $t = new Transactions();
 
 ?>
-
 <html>
 <head>
     <title>Summary</title>

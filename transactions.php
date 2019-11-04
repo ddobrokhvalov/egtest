@@ -5,8 +5,12 @@ include_once 'config.php';
 class Transactions {
 
     private $mysql;
+    
+    public $types;
 
     public function __construct() {
+		
+		$this->types = ['deposit','withdraw','bet','win'];
 
         $this->mysql = new \mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
@@ -58,5 +62,17 @@ class Transactions {
         return $result->fetch_all(MYSQLI_ASSOC);
 
     }
+    
+    public function addTransaction($user, $type, $amount){
+		if(!in_array($type, $this->types)){
+			return "Type incorrect";	
+		}
+		if(!is_numeric($amount)){
+			return "Amount incorrect";
+		}
+		$query = "INSERT into testdata (user,type,amount) VALUES ('".$this->mysql->real_escape_string($user)."','".$type."','".intval($amount)."')";
+		$this->mysql->query($query);
+		return "Ready";
+	}
 
 }
